@@ -7,3 +7,6 @@ spring:
       enabled: true
     restart:
       enabled: true
+
+jwt:
+  secret: hello.world.ee.ff
