@@ -1,11 +1,10 @@
 package com.example.test.controller;
 
+import com.example.test.domain.LoginRequest;
 import com.example.test.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -15,8 +14,8 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login() {
-        return ResponseEntity.ok().body(userService.login("", ""));
+    public ResponseEntity<String> login(@RequestBody LoginRequest dto) {
+        return ResponseEntity.ok().body(userService.login(dto.getUserName(), dto.getPassword()));
     }
 
     @PostMapping("/join")
