@@ -26,7 +26,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private final UserService userService;
     private final String secretKey;
 
-    // 인증받기 위한 문 - 여기를 통해야 들어갈 수 있다.
+    // 인증받기 위한 내부Filter - 여기를 통해야 들어갈 수 있다.
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -36,7 +36,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // Token이 없다면 그냥 반환시킴
         if(authorization == null){
-            log.error("authorization을 잘못 보냈습니다.");
+            log.error("[접근불가] authorization이 없습니다.");
             filterChain.doFilter(request, response);
             return;
         }
@@ -56,8 +56,18 @@ public class JwtFilter extends OncePerRequestFilter {
         log.info("userName:{}", userName);
 
         // 권한 부여
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(userName, null, List.of(new SimpleGrantedAuthority("USER")));
+        UsernamePasswordAuthenticationToken authenticationToken;
+        if(userName.equals("admin")) {
+            // id가 admin이면 관리가(ADMIN)권한 부여
+            authenticationToken = new UsernamePasswordAuthenticationToken
+                    (userName, null, List.of(new SimpleGrantedAuthority("ADMIN")));
+        }else {
+            // 아니라면 일반 사용자(USER)권한 부여
+            authenticationToken = new UsernamePasswordAuthenticationToken
+                    (userName, null, List.of(new SimpleGrantedAuthority("USER")));
+        }
+
+        log.info("Role : {}", authenticationToken.getAuthorities());
 
         // Detail을 넣어줍니다.
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
